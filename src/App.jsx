@@ -1,6 +1,6 @@
 import Calendar from "./components/Calendar";
 import PostInput from "./components/PostInput";
-import "./app.css";
+import "./styles.css";
 
 function App() {
   return (
