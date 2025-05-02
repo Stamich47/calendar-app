@@ -19,6 +19,18 @@
   background-color: #0056b3 !important;
 }
 
+.fc-daygrid-day-number {
+  font-weight: bold;
+  color: #4f5357;
+  text-decoration: none;
+}
+
+.fc-col-header-cell-cushion {
+  font-weight: bold;
+  color: #495057;
+  text-align: center;
+  text-decoration: none;
+}
 @media (max-width: 768px) {
   .fc-toolbar.fc-header-toolbar {
     flex-direction: column;
