@@ -1,42 +1,89 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.fc-toolbar {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.fc-button {
+  background-color: #007bff !important;
+  color: white !important;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.fc-button:hover {
+  background-color: #0056b3 !important;
+}
+
+@media (max-width: 768px) {
+  .fc-toolbar.fc-header-toolbar {
+    flex-direction: column;
+    align-items: stretch;
   }
-  to {
-    transform: rotate(360deg);
+
+  .fc-toolbar .fc-toolbar-chunk {
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .fc-button {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .fc {
+    padding: 0.5rem;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+.calendar-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-container .fc {
+  flex-grow: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+.fc-daygrid-day {
+  text-align: left;
+  vertical-align: top;
+  font-family: "Arial", sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  padding: 0.5rem;
+  border: 1px solid #dee2e6;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.fc-daygrid-day:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fc-day-today {
+  background-color: #e9ecef !important;
+  border: 2px solid #007bff;
+  color: #007bff !important;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 0;
   }
-}
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  .fc-daygrid-day {
+    font-size: 0.9rem;
+    padding: 0.4rem;
+  }
 }
