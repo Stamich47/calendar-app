@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -12,7 +12,6 @@ import { supabase } from "../services/supabaseClient";
 export default function Calendar({ isAuthenticated }) {
   const dispatch = useDispatch();
   const { events, status, error } = useSelector((state) => state.events);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const restoreSession = async () => {
@@ -28,17 +27,12 @@ export default function Calendar({ isAuthenticated }) {
 
       if (user) {
         console.log("Session restored for user:", user);
-        setUser(user);
         dispatch(fetchEvents());
-      } else {
-        setUser(null); // Clear user state when logged out
       }
     };
 
     if (isAuthenticated) {
       restoreSession();
-    } else {
-      setUser(null); // Clear user state when logged out
     }
   }, [isAuthenticated, dispatch]);
 
@@ -91,7 +85,7 @@ export default function Calendar({ isAuthenticated }) {
           right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
         }}
         themeSystem="bootstrap5"
-        events={isAuthenticated ? formattedEvents : []} // Clear events if not authenticated
+        events={isAuthenticated ? formattedEvents : []}
         dateClick={(info) => {
           console.log("Date clicked:", info.dateStr);
         }}

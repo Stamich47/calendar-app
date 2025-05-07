@@ -6,8 +6,10 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
   const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const [showProfileModal, setShowProfileModal] = useState(false); // State to control profile modal visibility
   const [isLogin, setIsLogin] = useState(true); // Toggle between login and signup
   const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState(""); // State for display name
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState(""); // State for confirm password
 
@@ -27,6 +29,12 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
       if (user) {
         console.log("Session restored for user:", user);
         setIsAuthenticated(true); // Set isAuthenticated to true if a session exists
+
+        // Fetch and set the displayName from user metadata
+        const userMetadata = user.user_metadata || {};
+        if (userMetadata.display_name) {
+          setDisplayName(userMetadata.display_name);
+        }
       }
     };
 
@@ -65,11 +73,50 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
     else setIsAuthenticated(false);
   };
 
+  const handleSaveProfile = async () => {
+    const { data: user, error } = await supabase.auth.getUser();
+    if (error) {
+      console.error("Error fetching user:", error.message);
+      alert("Failed to fetch user session.");
+      return;
+    }
+
+    if (user) {
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { display_name: displayName }, // Update the display_name in user metadata
+      });
+
+      if (updateError) {
+        console.error("Error updating profile:", updateError.message);
+        alert("Failed to update profile: " + updateError.message);
+      } else {
+        // Fetch updated user metadata
+        const { data: updatedUser, error: fetchError } =
+          await supabase.auth.getUser();
+        if (fetchError) {
+          console.error("Error fetching updated user:", fetchError.message);
+        } else {
+          console.log("Updated user data:", updatedUser);
+          const updatedMetadata = updatedUser.user_metadata || {};
+          if (updatedMetadata.display_name) {
+            setDisplayName(updatedMetadata.display_name);
+          }
+          alert("Profile updated successfully!");
+          setShowProfileModal(false);
+        }
+      }
+    } else {
+      alert("No user is logged in.");
+    }
+  };
+
   return (
     <>
       {isAuthenticated ? (
         // Authenticated: Profile Outline Icon
+
         <div className="dropdown">
+          {displayName && <span className="me-2">Hello, {displayName} </span>}
           <button
             className="btn btn-outline-secondary dropdown-toggle"
             type="button"
@@ -83,6 +130,16 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
             className="dropdown-menu dropdown-menu-end"
             aria-labelledby="profileDropdown"
           >
+            <li>
+              <button
+                className="dropdown-item"
+                onClick={() => {
+                  setShowProfileModal(true);
+                }}
+              >
+                Profile Settings{" "}
+              </button>
+            </li>
             <li>
               <button className="dropdown-item" onClick={handleLogout}>
                 Logout
@@ -179,6 +236,62 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
                   type="button"
                   className="btn btn-secondary"
                   onClick={() => setShowModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* {Modal for Profile Settings, including the Display Name} */}
+      {showProfileModal && (
+        <div
+          className="modal fade show"
+          style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+          tabIndex="-1"
+          role="dialog"
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Profile Settings</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowModal(false)}
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                <form>
+                  <div className="mb-3">
+                    <label htmlFor="displayName" className="form-label">
+                      Display Name
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="displayName"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                    />
+                  </div>
+                  {/* Add more profile settings here */}
+                </form>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleSaveProfile}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowProfileModal(false)}
                 >
                   Close
                 </button>
