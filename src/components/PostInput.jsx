@@ -19,11 +19,25 @@ export default function PostInput() {
     const { reminder, startTime, endTime } = formData;
 
     try {
+      // Get the authenticated user's ID
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError) {
+        console.error("Error fetching user:", authError.message);
+        alert("You must be logged in to add an event.");
+        return;
+      }
+
+      // Insert the event into the database
       const { data, error } = await supabase.from("events").insert([
         {
           title: reminder,
-          start: startTime,
-          end: endTime,
+          start_time: startTime,
+          end_time: endTime,
+          user_id: user.id, // Add the user_id to the event
         },
       ]);
 
@@ -60,8 +74,27 @@ export default function PostInput() {
             required
           />
         </div>
+        <div>
+          <label htmlFor="allDay" className="form-label">
+            All-Day Event
+          </label>
+          <input
+            type="checkbox"
+            id="allDay"
+            name="allDay"
+            className="form-check-input"
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              setFormData((prevData) => ({
+                ...prevData,
+                startTime: isChecked ? "" : prevData.startTime,
+                endTime: isChecked ? "" : prevData.endTime,
+              }));
+            }}
+          />
+        </div>
 
-        <div className="mb-3">
+        <div className="mb-3 d-flex flex-column">
           <label htmlFor="startTime" className="form-label">
             Start Time
           </label>

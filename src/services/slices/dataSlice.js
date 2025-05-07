@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../supabaseClient";
 
-const fetchEvents = createAsyncThunk("data/fetchEvents", async () => {
+export const fetchEvents = createAsyncThunk("events/fetchEvents", async () => {
   const { data, error } = await supabase.from("events").select("*");
   if (error) {
     throw new Error(error.message);
@@ -16,7 +16,11 @@ const eventsSlice = createSlice({
     status: "idle",
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearEvents: (state) => {
+      state.events = []; // Clear events when the user logs out
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchEvents.pending, (state) => {
@@ -24,7 +28,7 @@ const eventsSlice = createSlice({
       })
       .addCase(fetchEvents.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.events = action.payload;
+        state.events = action.payload; // Replace the events state with the fetched events
       })
       .addCase(fetchEvents.rejected, (state, action) => {
         state.status = "failed";
@@ -33,5 +37,5 @@ const eventsSlice = createSlice({
   },
 });
 
+export const { clearEvents } = eventsSlice.actions;
 export default eventsSlice.reducer;
-export { fetchEvents };

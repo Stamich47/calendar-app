@@ -92,10 +92,19 @@
 @media (max-width: 768px) {
   .calendar-container {
     padding: 0;
+    height: 75vh;
   }
 
   .fc-daygrid-day {
     font-size: 0.9rem;
     padding: 0.4rem;
   }
+
+  /* .event-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #007bff; 
+    border-radius: 50%;
+    margin: 0 auto;
+  } */
 }
