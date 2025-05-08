@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@eonasdan/tempus-dominus": "^6.10.4",
     "@fullcalendar/bootstrap": "^6.1.17",
     "@fullcalendar/bootstrap5": "^6.1.17",
     "@fullcalendar/daygrid": "^6.1.17",
@@ -23,7 +24,10 @@
     "@supabase/supabase-js": "^2.49.4",
     "bootstrap": "^5.3.5",
     "bootstrap-icons": "^1.12.1",
+    "date-fns": "^4.1.0",
     "react": "^19.0.0",
+    "react-bootstrap": "^2.10.9",
+    "react-datepicker": "^8.3.0",
     "react-dom": "^19.0.0",
     "react-google-calendar-api": "^2.3.0",
     "react-redux": "^9.2.0"

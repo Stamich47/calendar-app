@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Calendar from "./components/Calendar";
-import PostInput from "./components/PostInput";
 import NavBar from "./components/NavBar";
 
 import "./styles.css";
@@ -16,9 +15,7 @@ function App() {
           setIsAuthenticated={setIsAuthenticated}
         />
         <Calendar isAuthenticated={isAuthenticated} />
-        <div className="d-flex justify-content-center">
-          <PostInput />
-        </div>
+        <div className="d-flex justify-content-center"></div>
       </div>
     </>
   );

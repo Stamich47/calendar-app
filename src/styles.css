@@ -6,6 +6,25 @@
   margin-bottom: 1rem;
 }
 
+/* Center the title and navigation buttons */
+.fc-toolbar.fc-header-toolbar {
+  display: flex;
+  justify-content: center; /* Center the entire toolbar */
+  align-items: center; /* Vertically align items */
+  gap: 1rem; /* Add spacing between elements */
+}
+
+.fc-toolbar-chunk:first-child {
+  display: flex;
+  gap: 0.5rem; /* Add spacing between prev and next buttons */
+}
+
+.fc-toolbar-title {
+  font-size: 1.5rem; /* Adjust title font size */
+  font-weight: bold;
+  margin: 0 1rem; /* Add spacing around the title */
+}
+
 .fc-button {
   background-color: #007bff !important;
   color: white !important;
@@ -31,8 +50,9 @@
   text-align: center;
   text-decoration: none;
 }
+
 @media (max-width: 768px) {
-  .fc-toolbar.fc-header-toolbar {
+  /* .fc-toolbar.fc-header-toolbar {
     flex-direction: column;
     align-items: stretch;
   }
@@ -40,7 +60,7 @@
   .fc-toolbar .fc-toolbar-chunk {
     margin-bottom: 0.5rem;
     text-align: center;
-  }
+  } */
 
   .fc-button {
     font-size: 0.9rem;
@@ -99,12 +119,4 @@
     font-size: 0.9rem;
     padding: 0.4rem;
   }
-
-  /* .event-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #007bff; 
-    border-radius: 50%;
-    margin: 0 auto;
-  } */
 }

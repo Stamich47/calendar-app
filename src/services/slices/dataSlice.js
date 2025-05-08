@@ -20,6 +20,13 @@ const eventsSlice = createSlice({
     clearEvents: (state) => {
       state.events = []; // Clear events when the user logs out
     },
+    deleteEvent: (state, action) => {
+      console.log("Deleting event with ID:", action.payload); // Debug log
+      state.events = state.events.filter(
+        (event) => event.id !== action.payload
+      );
+      console.log("Updated events state:", state.events); // Debug log
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -37,5 +44,5 @@ const eventsSlice = createSlice({
   },
 });
 
-export const { clearEvents } = eventsSlice.actions;
+export const { clearEvents, deleteEvent } = eventsSlice.actions;
 export default eventsSlice.reducer;
