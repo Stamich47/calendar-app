@@ -27,8 +27,7 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
       }
 
       if (user) {
-        console.log("Session restored for user:", user);
-        setIsAuthenticated(true); // Set isAuthenticated to true if a session exists
+        setIsAuthenticated(true);
 
         // Fetch and set the displayName from user metadata
         const userMetadata = user.user_metadata || {};
@@ -115,8 +114,8 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
       {isAuthenticated ? (
         // Authenticated: Profile Outline Icon
 
-        <div className="dropdown">
-          {displayName && <span className="me-2">Hello, {displayName} </span>}
+        <div className="dropdown d-flex align-items-center">
+          {displayName && <span className="mx-2">Hello, {displayName} </span>}
           <button
             className="btn btn-outline-secondary dropdown-toggle"
             type="button"

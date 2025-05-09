@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import FullCalendar from "@fullcalendar/react";
+import UserAuth from "./UserAuth";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -38,7 +39,6 @@ export default function Calendar({ isAuthenticated }) {
       }
 
       if (user) {
-        console.log("Session restored for user:", user);
         dispatch(fetchEvents());
       }
     };
