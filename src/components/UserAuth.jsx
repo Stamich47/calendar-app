@@ -22,7 +22,6 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
       } = await supabase.auth.getUser();
 
       if (error) {
-        console.error("Error restoring session:", error.message);
         return;
       }
 
