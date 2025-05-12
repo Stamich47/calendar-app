@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabaseClient";
+import ProfileModal from "./ProfileModal"; // Import the new component
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
-  const [showProfileModal, setShowProfileModal] = useState(false); // State to control profile modal visibility
-  const [isLogin, setIsLogin] = useState(true); // Toggle between login and signup
+  const [showModal, setShowModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
-  const [displayName, setDisplayName] = useState(""); // State for display name
+  const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // State for confirm password
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Restore session on component mount
   useEffect(() => {
     const restoreSession = async () => {
       const {
@@ -29,7 +29,6 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
       if (user) {
         setIsAuthenticated(true);
 
-        // Fetch and set the displayName from user metadata
         const userMetadata = user.user_metadata || {};
         if (userMetadata.display_name) {
           setDisplayName(userMetadata.display_name);
@@ -82,14 +81,13 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
 
     if (user) {
       const { error: updateError } = await supabase.auth.updateUser({
-        data: { display_name: displayName }, // Update the display_name in user metadata
+        data: { display_name: displayName },
       });
 
       if (updateError) {
         console.error("Error updating profile:", updateError.message);
         alert("Failed to update profile: " + updateError.message);
       } else {
-        // Fetch updated user metadata
         const { data: updatedUser, error: fetchError } =
           await supabase.auth.getUser();
         if (fetchError) {
@@ -112,8 +110,6 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
   return (
     <>
       {isAuthenticated ? (
-        // Authenticated: Profile Outline Icon
-
         <div className="dropdown d-flex align-items-center">
           {displayName && <span className="mx-2">Hello, {displayName} </span>}
           <button
@@ -123,7 +119,7 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            <i className="bi bi-person-circle"></i> {/* Profile Outline Icon */}
+            <i className="bi bi-person-circle"></i>
           </button>
           <ul
             className="dropdown-menu dropdown-menu-end"
@@ -147,12 +143,11 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
           </ul>
         </div>
       ) : (
-        // Unauthenticated: Profile Icon with Plus
         <button
           className="btn btn-outline-primary"
           onClick={() => setShowModal(true)}
         >
-          <i className="bi bi-person-plus"></i> {/* Profile Icon with Plus */}
+          <i className="bi bi-person-plus"></i>
         </button>
       )}
 
@@ -243,61 +238,15 @@ export default function UserAuth({ isAuthenticated, setIsAuthenticated }) {
           </div>
         </div>
       )}
-      {/* {Modal for Profile Settings, including the Display Name} */}
+
+      {/* Profile Settings Modal */}
       {showProfileModal && (
-        <div
-          className="modal fade show"
-          style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-          tabIndex="-1"
-          role="dialog"
-        >
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Profile Settings</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowModal(false)}
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div className="modal-body">
-                <form>
-                  <div className="mb-3">
-                    <label htmlFor="displayName" className="form-label">
-                      Display Name
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="displayName"
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                    />
-                  </div>
-                  {/* Add more profile settings here */}
-                </form>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleSaveProfile}
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowProfileModal(false)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ProfileModal
+          displayName={displayName}
+          setDisplayName={setDisplayName}
+          onSaveProfile={handleSaveProfile}
+          onClose={() => setShowProfileModal(false)}
+        />
       )}
     </>
   );
