@@ -13,13 +13,15 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
+import CalendarDayView from "./CalendarDayView";
 
 export default function Calendar({ isAuthenticated }) {
   const dispatch = useDispatch();
   const { events, status, error } = useSelector((state) => state.events);
-
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [noEndTime, setNoEndTime] = useState(false);
+
   const [formData, setFormData] = useState({
     title: "",
     startTime: "",
@@ -80,22 +82,23 @@ export default function Calendar({ isAuthenticated }) {
   }));
 
   const handleDateClick = (info) => {
-    const currentDate = new Date();
-    const formattedDate = info.dateStr;
+    const formattedDate = info.dateStr; // FullCalendar provides the date in YYYY-MM-DD format
 
     // Get the current time in the user's local timezone
-    const currentTime = currentDate.toLocaleTimeString("en-US", {
+    const currentTime = new Date().toLocaleTimeString("en-US", {
       hour12: false,
       hour: "2-digit",
       minute: "2-digit",
     });
 
     setSelectedDate(formattedDate); // Set the clicked date
+
     setFormData({
       title: "",
       startTime: `${formattedDate}T${currentTime}`, // Prefill with local date and time
       endTime: `${formattedDate}T${currentTime}`, // Prefill with local date and time
     });
+
     setShowModal(true); // Open the modal
   };
 
@@ -116,11 +119,16 @@ export default function Calendar({ isAuthenticated }) {
         return;
       }
 
+      const localStartTime = new Date(formData.startTime).toLocaleString();
+      const localEndTime = noEndTime
+        ? null
+        : new Date(formData.endTime).toLocaleString();
+
       const { error } = await supabase.from("events").insert([
         {
           title: formData.title,
-          start_time: formData.startTime || selectedDate,
-          end_time: formData.endTime || selectedDate,
+          start_time: localStartTime,
+          end_time: localEndTime, // Use null if noEndTime is true
           user_id: user.id,
         },
       ]);
@@ -141,57 +149,72 @@ export default function Calendar({ isAuthenticated }) {
   };
 
   return (
-    <div className="calendar-container">
-      <FullCalendar
-        schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
-        plugins={[
-          dayGridPlugin,
-          timeGridPlugin,
-          interactionPlugin,
-          listPlugin,
-          bootstrapPlugin,
-        ]}
-        initialView="dayGridMonth"
-        headerToolbar={{
-          left: "prev",
-          center: "title",
-          right: "next",
-        }}
-        themeSystem="bootstrap5"
-        events={isAuthenticated ? formattedEvents : []}
-        dateClick={handleDateClick} // Open modal on date click
-        eventClick={async (info) => {
-          console.log("Event clicked:", info.event); // Debug log
-          console.log("Event ID:", info.event.id); // Debug log
+    <div className="d-flex flex-column-reverse flex-md-row">
+      <div style={{ flex: "1 1 25%" }}>
+        <CalendarDayView selectedDate={selectedDate} events={formattedEvents} />
+      </div>
+      <div style={{ flex: "2 1 75%" }}>
+        <FullCalendar
+          schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
+          plugins={[
+            dayGridPlugin,
+            timeGridPlugin,
+            interactionPlugin,
+            listPlugin,
+            bootstrapPlugin,
+          ]}
+          initialView="dayGridMonth"
+          headerToolbar={{
+            left: "prev",
+            center: "title",
+            right: "next",
+          }}
+          themeSystem="bootstrap5"
+          events={isAuthenticated ? formattedEvents : []}
+          dateClick={handleDateClick} // Open modal on date click
+          eventClick={async (info) => {
+            const confirmDelete = window.confirm(
+              `Are you sure you want to delete the event "${info.event.title}"?`
+            );
+            if (confirmDelete) {
+              try {
+                const { error } = await supabase
+                  .from("events")
+                  .delete()
+                  .eq("event_id", info.event.id); // Ensure this matches your database schema
 
-          const confirmDelete = window.confirm(
-            `Are you sure you want to delete the event "${info.event.title}"?`
-          );
-          if (confirmDelete) {
-            try {
-              const { error } = await supabase
-                .from("events")
-                .delete()
-                .eq("event_id", info.event.id); // Ensure this matches your database schema
-
-              if (error) {
-                console.error("Error deleting event:", error.message);
-                alert("Failed to delete the event. Please try again.");
-              } else {
-                console.log("Event deleted from database:", info.event.id);
-                alert("Event deleted successfully!");
-                dispatch(deleteEvent(info.event.id)); // Dispatch the delete action
+                if (error) {
+                  console.error("Error deleting event:", error.message);
+                  alert("Failed to delete the event. Please try again.");
+                } else {
+                  console.log("Event deleted from database:", info.event.id);
+                  alert("Event deleted successfully!");
+                  dispatch(deleteEvent(info.event.id)); // Dispatch the delete action
+                }
+              } catch (err) {
+                console.error("Unexpected error:", err);
+                alert("An unexpected error occurred. Please try again.");
               }
-            } catch (err) {
-              console.error("Unexpected error:", err);
-              alert("An unexpected error occurred. Please try again.");
             }
-          }
-        }}
-      />
+          }}
+        />
+      </div>
 
       {/* Modal for Adding Events */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal
+        show={showModal}
+        onHide={() => {
+          setShowModal(false);
+          setFormData({ title: "", startTime: "", endTime: "" }); // Reset form data
+        }}
+        onShow={() => {
+          setNoEndTime(false); // Reset noEndTime to false when modal is opened
+          setFormData((prevData) => ({
+            ...prevData,
+            endTime: prevData.endTime || new Date().toISOString(), // Ensure endTime has a default value
+          }));
+        }}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Add Event</Modal.Title>
         </Modal.Header>
@@ -222,16 +245,18 @@ export default function Calendar({ isAuthenticated }) {
                 onChange={(date) =>
                   setFormData((prev) => ({
                     ...prev,
-                    startTime: date.toISOString(),
+                    startTime: date.toISOString(), // Store in ISO format for consistency
                   }))
                 }
                 showTimeSelect
-                dateFormat="MMMM dd-yyyy HH:mm"
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                dateFormat="MMMM dd, yyyy h:mm aa"
                 className="form-control"
                 placeholderText="Select start time"
               />
             </div>
-            <div className="mb-3">
+            <div className={`mb-3 ${noEndTime ? "d-none" : ""}`}>
               <label htmlFor="endTime" className="form-label">
                 End Time
               </label>
@@ -240,13 +265,35 @@ export default function Calendar({ isAuthenticated }) {
                 onChange={(date) =>
                   setFormData((prev) => ({
                     ...prev,
-                    endTime: date.toISOString(),
+                    endTime: date.toISOString(), // Store in ISO format for consistency
                   }))
                 }
                 showTimeSelect
-                dateFormat="MMMM dd-yyyy HH:mm"
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                dateFormat="MMMM dd, yyyy h:mm aa"
                 className="form-control"
                 placeholderText="Select end time"
+                disabled={noEndTime}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="noEndTime" className="form-label">
+                No End Time
+              </label>
+              <input
+                type="checkbox"
+                id="noEndTime"
+                name="noEndTime"
+                className="form-check-input"
+                onChange={(e) => {
+                  const isChecked = e.target.checked;
+                  setNoEndTime(isChecked);
+                  setFormData((prevData) => ({
+                    ...prevData,
+                    endTime: isChecked ? "" : prevData.endTime,
+                  }));
+                }}
               />
             </div>
           </form>

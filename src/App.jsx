@@ -12,26 +12,30 @@ function App() {
 
   return (
     <>
-      <div className="mx-2 mt-5">
-        <NavBar
-          isAuthenticated={isAuthenticated}
-          setIsAuthenticated={setIsAuthenticated}
-        />
-        <Routes>
-          <Route
-            path="/"
-            element={<Calendar isAuthenticated={isAuthenticated} />}
+      <div className="mx-2 d-flex flex-column">
+        <nav>
+          <NavBar
+            isAuthenticated={isAuthenticated}
+            setIsAuthenticated={setIsAuthenticated}
           />
-          <Route
-            path="/time-tracker"
-            element={<TimeTracker isAuthenticated={isAuthenticated} />}
-          />
-          <Route
-            path="/appointments"
-            element={<Appointments isAuthenticated={isAuthenticated} />}
-          />
-        </Routes>
-        <div className="d-flex justify-content-center"></div>
+        </nav>
+
+        <div>
+          <Routes>
+            <Route
+              path="/"
+              element={<Calendar isAuthenticated={isAuthenticated} />}
+            />
+            <Route
+              path="/time-tracker"
+              element={<TimeTracker isAuthenticated={isAuthenticated} />}
+            />
+            <Route
+              path="/appointments"
+              element={<Appointments isAuthenticated={isAuthenticated} />}
+            />
+          </Routes>
+        </div>
       </div>
     </>
   );

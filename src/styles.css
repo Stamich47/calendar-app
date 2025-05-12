@@ -51,6 +51,10 @@
   text-decoration: none;
 }
 
+.end-time-hidden {
+  display: none;
+}
+
 @media (max-width: 768px) {
   /* .fc-toolbar.fc-header-toolbar {
     flex-direction: column;

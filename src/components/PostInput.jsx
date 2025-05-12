@@ -120,7 +120,6 @@ export default function PostInput() {
             className="form-control"
             value={formData.endTime}
             onChange={handleChange}
-            required
           />
         </div>
 
