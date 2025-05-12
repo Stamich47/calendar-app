@@ -33,7 +33,7 @@ export default function ProfileModal({
       }
 
       // Send the user ID to the backend
-      const response = await fetch("/api/deleteAccount", {
+      const response = await fetch("/.netlify/functions/deleteAccount", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user.id }),
