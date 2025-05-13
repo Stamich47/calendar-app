@@ -149,7 +149,7 @@ export default function Calendar({ isAuthenticated }) {
   };
 
   return (
-    <div className="d-flex flex-column-reverse flex-md-row gap-3">
+    <div className="d-flex flex-column-reverse flex-md-row gap-2">
       <div style={{ flex: "1 1 25%" }}>
         <CalendarDayView selectedDate={selectedDate} events={formattedEvents} />
       </div>

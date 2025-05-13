@@ -11,8 +11,8 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Manage authentication state
 
   return (
-    <div className="mx-2 d-flex flex-column container-fluid">
-      <nav>
+    <div className="d-flex flex-column container-fluid mt-2">
+      <nav className="mb-2">
         <NavBar
           isAuthenticated={isAuthenticated}
           setIsAuthenticated={setIsAuthenticated}

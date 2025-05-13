@@ -21,14 +21,20 @@ export default function CalendarDayView({ selectedDate, events }) {
 
   return (
     <div
-      className="container d-flex flex-column border border-2 rounded-3 p-3"
+      className="container d-flex flex-column border border-1 rounded-3 p-3"
       style={{ height: "90vh" }}
     >
       <h4 className="text-center">
         Events for{" "}
-        {selectedDate ? formatDate(selectedDate) : "No Date Selected"}
+        {selectedDate
+          ? formatDate(selectedDate)
+          : new Date().toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
       </h4>
-      <div>
+      <div className="border border-1 rounded-3">
         {selectedDate ? (
           <FullCalendar
             key={selectedDate}
@@ -38,10 +44,16 @@ export default function CalendarDayView({ selectedDate, events }) {
             initialDate={selectedDate}
             headerToolbar={false}
             events={filteredEvents}
-            noEventsContent="No events for this day."
           />
         ) : (
-          <p>No date selected</p>
+          <FullCalendar
+            themeSystem="bootstrap5"
+            plugins={[listPlugin, interactionPlugin, bootstrapPlugin]}
+            initialView="listDay"
+            initialDate={new Date().toISOString().split("T")[0]} // Today's date
+            headerToolbar={false}
+            events={filteredEvents}
+          />
         )}
       </div>
     </div>

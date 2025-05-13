@@ -2,6 +2,7 @@ import UserAuth from "./UserAuth";
 import { FaRegCalendarAlt, FaClock, FaClipboardList } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function NavBar({ isAuthenticated, setIsAuthenticated }) {
   const location = useLocation();
@@ -9,22 +10,22 @@ export default function NavBar({ isAuthenticated, setIsAuthenticated }) {
   const getCurrentIcon = () => {
     switch (location.pathname) {
       case "/":
-        return <FaRegCalendarAlt />;
+        return <i className="bi bi-calendar3"></i>;
       case "/time-tracker":
-        return <FaClock />;
+        return <i className="bi bi-clock-history"></i>;
       case "/appointments":
-        return <FaClipboardList />;
+        return <i className="bi bi-clipboard-check-fill"></i>;
       default:
         return null;
     }
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <nav className="navbar navbar-expand-lg navbar-light bg-light border border-1 rounded-3">
       <div className="container-fluid">
         <div className="navbar-brand dropdown">
           <button
-            className="btn btn-primary dropdown-toggle"
+            className="btn btn-outline-primary dropdown-toggle"
             type="button"
             id="dropdownMenuButton"
             data-bs-toggle="dropdown"
