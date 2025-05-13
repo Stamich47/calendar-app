@@ -149,13 +149,14 @@ export default function Calendar({ isAuthenticated }) {
   };
 
   return (
-    <div className="d-flex flex-column-reverse flex-md-row">
+    <div className="d-flex flex-column-reverse flex-md-row gap-3">
       <div style={{ flex: "1 1 25%" }}>
         <CalendarDayView selectedDate={selectedDate} events={formattedEvents} />
       </div>
       <div style={{ flex: "2 1 75%" }}>
         <FullCalendar
           schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
+          height={"90vh"}
           plugins={[
             dayGridPlugin,
             timeGridPlugin,

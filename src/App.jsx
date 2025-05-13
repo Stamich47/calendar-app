@@ -11,33 +11,31 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Manage authentication state
 
   return (
-    <>
-      <div className="mx-2 d-flex flex-column">
-        <nav>
-          <NavBar
-            isAuthenticated={isAuthenticated}
-            setIsAuthenticated={setIsAuthenticated}
-          />
-        </nav>
+    <div className="mx-2 d-flex flex-column container-fluid">
+      <nav>
+        <NavBar
+          isAuthenticated={isAuthenticated}
+          setIsAuthenticated={setIsAuthenticated}
+        />
+      </nav>
 
-        <div>
-          <Routes>
-            <Route
-              path="/"
-              element={<Calendar isAuthenticated={isAuthenticated} />}
-            />
-            <Route
-              path="/time-tracker"
-              element={<TimeTracker isAuthenticated={isAuthenticated} />}
-            />
-            <Route
-              path="/appointments"
-              element={<Appointments isAuthenticated={isAuthenticated} />}
-            />
-          </Routes>
-        </div>
+      <div>
+        <Routes>
+          <Route
+            path="/"
+            element={<Calendar isAuthenticated={isAuthenticated} />}
+          />
+          <Route
+            path="/time-tracker"
+            element={<TimeTracker isAuthenticated={isAuthenticated} />}
+          />
+          <Route
+            path="/appointments"
+            element={<Appointments isAuthenticated={isAuthenticated} />}
+          />
+        </Routes>
       </div>
-    </>
+    </div>
   );
 }
 

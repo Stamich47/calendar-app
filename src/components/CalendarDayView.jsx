@@ -1,38 +1,49 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import listPlugin from "@fullcalendar/list";
+import interactionPlugin from "@fullcalendar/interaction";
+import bootstrapPlugin from "@fullcalendar/bootstrap5";
 
 export default function CalendarDayView({ selectedDate, events }) {
-  useEffect(() => {
-    if (selectedDate) {
-      console.log("Selected date changed:", selectedDate);
-    }
-  }, [selectedDate]);
-
   const formatDate = (dateString) => {
     const date = new Date(dateString + "T00:00:00"); // Force local timezone
     return date.toLocaleDateString();
   };
 
+  const filteredEvents = events.filter((event) => {
+    const eventDate = new Date(event.start).toLocaleDateString();
+    return eventDate === formatDate(selectedDate);
+  });
+
+  useEffect(() => {
+    console.log("Filtered Events:", filteredEvents);
+  }, [filteredEvents]);
+
   return (
-    <div>
-      <h3>
+    <div
+      className="container d-flex flex-column border border-2 rounded-3 p-3"
+      style={{ height: "90vh" }}
+    >
+      <h4 className="text-center">
         Events for{" "}
         {selectedDate ? formatDate(selectedDate) : "No Date Selected"}
-      </h3>
-      {selectedDate ? (
-        <FullCalendar
-          key={selectedDate}
-          plugins={[listPlugin]}
-          initialView="listDay"
-          initialDate={selectedDate}
-          headerToolbar={false}
-          events={events}
-          noEventsContent="No events for this day."
-        />
-      ) : (
-        <p>No date selected</p>
-      )}
+      </h4>
+      <div>
+        {selectedDate ? (
+          <FullCalendar
+            key={selectedDate}
+            themeSystem="bootstrap5"
+            plugins={[listPlugin, interactionPlugin, bootstrapPlugin]}
+            initialView="listDay"
+            initialDate={selectedDate}
+            headerToolbar={false}
+            events={filteredEvents}
+            noEventsContent="No events for this day."
+          />
+        ) : (
+          <p>No date selected</p>
+        )}
+      </div>
     </div>
   );
 }
