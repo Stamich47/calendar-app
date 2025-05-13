@@ -4,7 +4,11 @@ import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
 import bootstrapPlugin from "@fullcalendar/bootstrap5";
 
-export default function CalendarDayView({ selectedDate, events }) {
+export default function CalendarDayView({
+  selectedDate,
+  events,
+  onButtonClick,
+}) {
   const formatDate = (dateString) => {
     const date = new Date(dateString + "T00:00:00"); // Force local timezone
     return date.toLocaleDateString();
@@ -56,6 +60,9 @@ export default function CalendarDayView({ selectedDate, events }) {
           />
         )}
       </div>
+      <button onClick={onButtonClick} className="btn btn-outline-primary mt-3">
+        <i className="bi bi-plus-circle"></i> Add Event
+      </button>
     </div>
   );
 }

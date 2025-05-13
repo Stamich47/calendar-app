@@ -14,6 +14,7 @@ import Button from "react-bootstrap/Button";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 import CalendarDayView from "./CalendarDayView";
+import AddEventModal from "./AddEventModal";
 
 export default function Calendar({ isAuthenticated }) {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ export default function Calendar({ isAuthenticated }) {
 
   const [formData, setFormData] = useState({
     title: "",
+    description: "",
     startTime: "",
     endTime: "",
   });
@@ -50,32 +52,9 @@ export default function Calendar({ isAuthenticated }) {
     }
   }, [isAuthenticated, dispatch]);
 
-  useEffect(() => {
-    if (!isAuthenticated) return; // Only subscribe if the user is authenticated
-
-    const subscription = supabase
-      .channel("realtime:events")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "events" },
-        (payload) => {
-          console.log("Change received!", payload);
-          dispatch(fetchEvents());
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, [isAuthenticated, dispatch]);
-
-  if (status === "failed") {
-    return <p>Error: {error}</p>;
-  }
-
   const formattedEvents = events.map((event) => ({
     id: event.event_id, // Map the event_id column to the id property
+    description: event.description,
     title: event.title,
     start: event.start_time,
     end: event.end_time,
@@ -95,11 +74,14 @@ export default function Calendar({ isAuthenticated }) {
 
     setFormData({
       title: "",
+      description: "",
       startTime: `${formattedDate}T${currentTime}`, // Prefill with local date and time
       endTime: `${formattedDate}T${currentTime}`, // Prefill with local date and time
     });
 
     setShowModal(true); // Open the modal
+
+    console.log("Clicked date:", formattedDate);
   };
 
   const handleInputChange = (e) => {
@@ -119,14 +101,15 @@ export default function Calendar({ isAuthenticated }) {
         return;
       }
 
-      const localStartTime = new Date(formData.startTime).toLocaleString();
+      const localStartTime = new Date(formData.startTime).toISOString();
       const localEndTime = noEndTime
         ? null
-        : new Date(formData.endTime).toLocaleString();
+        : new Date(formData.endTime).toISOString();
 
       const { error } = await supabase.from("events").insert([
         {
           title: formData.title,
+          description: formData.description,
           start_time: localStartTime,
           end_time: localEndTime, // Use null if noEndTime is true
           user_id: user.id,
@@ -140,7 +123,7 @@ export default function Calendar({ isAuthenticated }) {
         alert("Event added successfully!");
         dispatch(fetchEvents()); // Refresh events
         setShowModal(false); // Close the modal
-        setFormData({ title: "", startTime: "", endTime: "" }); // Reset form
+        setFormData({ title: "", description: "", startTime: "", endTime: "" }); // Reset form
       }
     } catch (err) {
       console.error("Unexpected error:", err);
@@ -148,10 +131,37 @@ export default function Calendar({ isAuthenticated }) {
     }
   };
 
+  if (status === "loading") {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status"></div>
+        <h5 className="ms-3 text-primary">Fetching Calendar Events...</h5>
+      </div>
+    );
+  }
+
+  if (status === "failed") {
+    return <div>Error: {error}</div>;
+  }
+
+  const handleButtonClick = () => {
+    setShowModal(true);
+    setFormData({
+      title: "",
+      description: "",
+      startTime: `${selectedDate}T00:00:00`,
+      endTime: `${selectedDate}T23:59:59`,
+    });
+  };
+
   return (
     <div className="d-flex flex-column-reverse flex-md-row gap-2">
       <div style={{ flex: "1 1 25%" }}>
-        <CalendarDayView selectedDate={selectedDate} events={formattedEvents} />
+        <CalendarDayView
+          onButtonClick={handleButtonClick}
+          selectedDate={selectedDate}
+          events={formattedEvents}
+        />
       </div>
       <div style={{ flex: "2 1 75%" }}>
         <FullCalendar
@@ -178,6 +188,7 @@ export default function Calendar({ isAuthenticated }) {
               `Are you sure you want to delete the event "${info.event.title}"?`
             );
             if (confirmDelete) {
+              dispatch(deleteEvent(info.event.id)); // Dispatch the delete action
               try {
                 const { error } = await supabase
                   .from("events")
@@ -190,7 +201,7 @@ export default function Calendar({ isAuthenticated }) {
                 } else {
                   console.log("Event deleted from database:", info.event.id);
                   alert("Event deleted successfully!");
-                  dispatch(deleteEvent(info.event.id)); // Dispatch the delete action
+                  dispatch(fetchEvents()); // Refresh events
                 }
               } catch (err) {
                 console.error("Unexpected error:", err);
@@ -202,112 +213,17 @@ export default function Calendar({ isAuthenticated }) {
       </div>
 
       {/* Modal for Adding Events */}
-      <Modal
+      <AddEventModal
         show={showModal}
-        onHide={() => {
-          setShowModal(false);
-          setFormData({ title: "", startTime: "", endTime: "" }); // Reset form data
-        }}
-        onShow={() => {
-          setNoEndTime(false); // Reset noEndTime to false when modal is opened
-          setFormData((prevData) => ({
-            ...prevData,
-            endTime: prevData.endTime || new Date().toISOString(), // Ensure endTime has a default value
-          }));
-        }}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Add Event</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <form>
-            <div className="mb-3">
-              <label htmlFor="title" className="form-label">
-                Event Title
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                className="form-control"
-                value={formData.title}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="startTime" className="form-label">
-                Start Time
-              </label>
-              <DatePicker
-                selected={
-                  formData.startTime ? new Date(formData.startTime) : null
-                }
-                onChange={(date) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    startTime: date.toISOString(), // Store in ISO format for consistency
-                  }))
-                }
-                showTimeSelect
-                timeFormat="HH:mm"
-                timeIntervals={15}
-                dateFormat="MMMM dd, yyyy h:mm aa"
-                className="form-control"
-                placeholderText="Select start time"
-              />
-            </div>
-            <div className={`mb-3 ${noEndTime ? "d-none" : ""}`}>
-              <label htmlFor="endTime" className="form-label">
-                End Time
-              </label>
-              <DatePicker
-                selected={formData.endTime ? new Date(formData.endTime) : null}
-                onChange={(date) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    endTime: date.toISOString(), // Store in ISO format for consistency
-                  }))
-                }
-                showTimeSelect
-                timeFormat="HH:mm"
-                timeIntervals={15}
-                dateFormat="MMMM dd, yyyy h:mm aa"
-                className="form-control"
-                placeholderText="Select end time"
-                disabled={noEndTime}
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="noEndTime" className="form-label">
-                No End Time
-              </label>
-              <input
-                type="checkbox"
-                id="noEndTime"
-                name="noEndTime"
-                className="form-check-input"
-                onChange={(e) => {
-                  const isChecked = e.target.checked;
-                  setNoEndTime(isChecked);
-                  setFormData((prevData) => ({
-                    ...prevData,
-                    endTime: isChecked ? "" : prevData.endTime,
-                  }));
-                }}
-              />
-            </div>
-          </form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleAddEvent}>
-            Add Event
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        setShowModal={setShowModal}
+        onHide={() => setShowModal(false)}
+        formData={formData}
+        setFormData={setFormData}
+        handleInputChange={handleInputChange}
+        handleAddEvent={handleAddEvent}
+        noEndTime={noEndTime}
+        setNoEndTime={setNoEndTime}
+      />
     </div>
   );
 }
