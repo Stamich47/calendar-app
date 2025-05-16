@@ -30,6 +30,7 @@
     "express": "^5.1.0",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
+    "react-calendar": "^5.1.0",
     "react-datepicker": "^8.3.0",
     "react-dom": "^19.0.0",
     "react-google-calendar-api": "^2.3.0",

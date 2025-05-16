@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 import FullCalendar from "@fullcalendar/react";
 import UserAuth from "./UserAuth";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -16,12 +18,14 @@ import DatePicker from "react-datepicker";
 import CalendarDayView from "./CalendarDayView";
 import AddEventModal from "./AddEventModal";
 
-export default function Calendar({ isAuthenticated }) {
+export default function AppCalendar({ isAuthenticated }) {
   const dispatch = useDispatch();
   const { events, status, error } = useSelector((state) => state.events);
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedMobileDate, setSelectedMobileDate] = useState(null);
   const [noEndTime, setNoEndTime] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -29,6 +33,14 @@ export default function Calendar({ isAuthenticated }) {
     startTime: "",
     endTime: "",
   });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const restoreSession = async () => {
@@ -79,9 +91,7 @@ export default function Calendar({ isAuthenticated }) {
       endTime: `${formattedDate}T${currentTime}`, // Prefill with local date and time
     });
 
-    setShowModal(true); // Open the modal
-
-    console.log("Clicked date:", formattedDate);
+    // setShowModal(true);
   };
 
   const handleInputChange = (e) => {
@@ -144,72 +154,129 @@ export default function Calendar({ isAuthenticated }) {
     return <div>Error: {error}</div>;
   }
 
+  const today = new Date().toISOString().split("T")[0];
   const handleButtonClick = () => {
     setShowModal(true);
     setFormData({
       title: "",
       description: "",
-      startTime: `${selectedDate}T00:00:00`,
-      endTime: `${selectedDate}T23:59:59`,
+      startTime: `${selectedDate || today}T00:00:00`, // Start at midnight of the selected day
+      endTime: `${selectedDate || today}T23:59:59`, // End at the last minute of the selected day
     });
   };
 
-  return (
-    <div className="d-flex flex-column-reverse flex-md-row gap-2">
-      <div style={{ flex: "1 1 25%" }}>
-        <CalendarDayView
-          onButtonClick={handleButtonClick}
-          selectedDate={selectedDate}
-          events={formattedEvents}
-        />
-      </div>
-      <div style={{ flex: "2 1 75%" }}>
-        <FullCalendar
-          schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
-          height={"90vh"}
-          plugins={[
-            dayGridPlugin,
-            timeGridPlugin,
-            interactionPlugin,
-            listPlugin,
-            bootstrapPlugin,
-          ]}
-          initialView="dayGridMonth"
-          headerToolbar={{
-            left: "prev",
-            center: "title",
-            right: "next",
-          }}
-          themeSystem="bootstrap5"
-          events={isAuthenticated ? formattedEvents : []}
-          dateClick={handleDateClick} // Open modal on date click
-          eventClick={async (info) => {
-            const confirmDelete = window.confirm(
-              `Are you sure you want to delete the event "${info.event.title}"?`
-            );
-            if (confirmDelete) {
-              dispatch(deleteEvent(info.event.id)); // Dispatch the delete action
-              try {
-                const { error } = await supabase
-                  .from("events")
-                  .delete()
-                  .eq("event_id", info.event.id); // Ensure this matches your database schema
+  const hasEventOnDate = (date) => {
+    // Format date as YYYY-MM-DD for comparison
+    const dateStr = date.toISOString().split("T")[0];
+    return formattedEvents.some(
+      (event) => event.start.split("T")[0] === dateStr
+    );
+  };
 
-                if (error) {
-                  console.error("Error deleting event:", error.message);
-                  alert("Failed to delete the event. Please try again.");
-                } else {
-                  console.log("Event deleted from database:", info.event.id);
-                  alert("Event deleted successfully!");
-                  dispatch(fetchEvents()); // Refresh events
-                }
-              } catch (err) {
-                console.error("Unexpected error:", err);
-                alert("An unexpected error occurred. Please try again.");
+  return (
+    <div className="calendar-mobile-layout d-flex flex-column-reverse flex-md-row gap-2">
+      <div className="calendar-bottom" style={{ flex: "1 1 25%" }}>
+        {isMobileView ? (
+          <div className="d-flex flex-column justify-content-between align-items-center mb-2">
+            <h5 className="text-primary">
+              {selectedMobileDate
+                ? selectedMobileDate.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                : "No Date"}
+            </h5>{" "}
+            <Button
+              variant="primary"
+              onClick={handleButtonClick}
+              className="btn btn-primary"
+            >
+              Add Event
+            </Button>
+          </div>
+        ) : (
+          <CalendarDayView
+            onButtonClick={handleButtonClick}
+            selectedDate={selectedDate}
+            events={formattedEvents}
+          />
+        )}
+      </div>
+      <div className="calendar-top" style={{ flex: "2 1 75%" }}>
+        {isMobileView ? (
+          <div className="modern-mobile-calendar-wrapper">
+            <Calendar
+              onChange={setSelectedMobileDate}
+              value={
+                selectedMobileDate ? new Date(selectedMobileDate) : new Date()
               }
-            }
-          }}
-        />
+              onClickDay={(date) => {
+                setSelectedMobileDate(date);
+              }}
+              className="react-calendar modern-mobile-calendar"
+              tileClassName={({ date, view }) => {
+                if (view === "month" && hasEventOnDate(date)) {
+                  return "calendar-has-event";
+                }
+
+                if (
+                  view === "month" &&
+                  date.toDateString() === new Date().toDateString()
+                ) {
+                  return "highlight";
+                }
+                return null;
+              }}
+            />
+          </div>
+        ) : (
+          <FullCalendar
+            height={"90vh"}
+            plugins={[
+              dayGridPlugin,
+              timeGridPlugin,
+              interactionPlugin,
+              listPlugin,
+              bootstrapPlugin,
+            ]}
+            initialView="dayGridMonth"
+            headerToolbar={{
+              left: "prev",
+              center: "title",
+              right: "next",
+            }}
+            themeSystem="bootstrap5"
+            events={isAuthenticated ? formattedEvents : []}
+            dateClick={handleDateClick}
+            eventClick={async (info) => {
+              const confirmDelete = window.confirm(
+                `Are you sure you want to delete the event "${info.event.title}"?`
+              );
+              if (confirmDelete) {
+                dispatch(deleteEvent(info.event.id));
+                try {
+                  const { error } = await supabase
+                    .from("events")
+                    .delete()
+                    .eq("event_id", info.event.id);
+
+                  if (error) {
+                    console.error("Error deleting event:", error.message);
+                    alert("Failed to delete the event. Please try again.");
+                  } else {
+                    console.log("Event deleted from database:", info.event.id);
+                    alert("Event deleted successfully!");
+                    dispatch(fetchEvents()); // Refresh events
+                  }
+                } catch (err) {
+                  console.error("Unexpected error:", err);
+                  alert("An unexpected error occurred. Please try again.");
+                }
+              }
+            }}
+          />
+        )}
       </div>
 
       {/* Modal for Adding Events */}

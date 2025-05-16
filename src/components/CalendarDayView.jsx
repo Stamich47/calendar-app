@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -14,14 +13,19 @@ export default function CalendarDayView({
     return date.toLocaleDateString();
   };
 
+  const formatTitleDate = (dateString) => {
+    const date = new Date(dateString + "T00:00:00"); // Force local timezone
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   const filteredEvents = events.filter((event) => {
     const eventDate = new Date(event.start).toLocaleDateString();
     return eventDate === formatDate(selectedDate);
   });
-
-  useEffect(() => {
-    console.log("Filtered Events:", filteredEvents);
-  }, [filteredEvents]);
 
   return (
     <div
@@ -31,7 +35,7 @@ export default function CalendarDayView({
       <h4 className="text-center">
         Events for{" "}
         {selectedDate
-          ? formatDate(selectedDate)
+          ? formatTitleDate(selectedDate)
           : new Date().toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -54,7 +58,7 @@ export default function CalendarDayView({
             themeSystem="bootstrap5"
             plugins={[listPlugin, interactionPlugin, bootstrapPlugin]}
             initialView="listDay"
-            initialDate={new Date().toISOString().split("T")[0]} // Today's date
+            initialDate={new Date().toISOString()} // Today's date
             headerToolbar={false}
             events={filteredEvents}
           />

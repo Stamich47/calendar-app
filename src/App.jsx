@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import Calendar from "./components/Calendar";
+import AppCalendar from "./components/Calendar";
 import TimeTracker from "./components/TimeTracker";
 import Appointments from "./components/Appointments";
 import NavBar from "./components/NavBar";
-
 import "./styles.css";
 
 function App() {
@@ -23,7 +22,7 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<Calendar isAuthenticated={isAuthenticated} />}
+            element={<AppCalendar isAuthenticated={isAuthenticated} />}
           />
           <Route
             path="/time-tracker"

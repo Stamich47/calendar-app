@@ -1,4 +1,79 @@
-.fc-toolbar {
+/* Modern mobile calendar look for react-calendar */
+.modern-mobile-calendar {
+  border: none;
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0.5rem 0.2rem 0.5rem;
+  background: #fff;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  font-size: 1rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.modern-mobile-calendar .react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.modern-mobile-calendar .react-calendar__navigation button {
+  background: none;
+  border: none;
+  color: #1976d2;
+  font-size: 1.3rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+}
+.modern-mobile-calendar .react-calendar__navigation button:enabled:hover {
+  background: #f0f4fa;
+}
+
+.modern-mobile-calendar .react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 0.2rem;
+}
+
+.modern-mobile-calendar .react-calendar__tile {
+  border-radius: 0.7rem;
+  padding: 1.1em 0 1.1em 0;
+  background: none;
+  transition: background 0.2s, color 0.2s;
+  font-size: 1rem;
+  color: #222;
+}
+
+.modern-mobile-calendar .react-calendar__tile--active,
+.modern-mobile-calendar .react-calendar__tile--now {
+  background: #1f728ba4 !important;
+  color: #fff !important;
+}
+
+.modern-mobile-calendar
+  .react-calendar__tile--now:not(.react-calendar__tile--active) {
+  background: #e3f2fd !important;
+}
+
+.modern-mobile-calendar .react-calendar__tile:enabled:hover,
+.modern-mobile-calendar .react-calendar__tile:enabled:focus {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.modern-mobile-calendar .react-calendar__tile--range {
+  background: #bbdefb;
+  color: #1976d2;
+}
+
+/* FullCalendar styles scoped */
+.modern-mobile-calendar .fc-toolbar {
   background-color: #f8f9fa;
   border: 1px solid #dee2e6;
   padding: 0.5rem;
@@ -6,24 +81,24 @@
   margin-bottom: 1rem;
 }
 
-.fc-view {
+.modern-mobile-calendar .fc-view {
   border-radius: 0.5rem;
 }
 
-.fc-toolbar.fc-header-toolbar {
+.modern-mobile-calendar .fc-toolbar.fc-header-toolbar {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
 }
 
-.fc-toolbar-title {
-  font-size: 1.5rem; /* Adjust title font size */
+.modern-mobile-calendar .fc-toolbar-title {
+  font-size: 1.5rem;
   font-weight: bold;
-  margin: 0 1rem; /* Add spacing around the title */
+  margin: 0 1rem;
 }
 
-.fc-button {
+.modern-mobile-calendar .fc-button {
   background-color: #007bff !important;
   color: white !important;
   border-radius: 0.25rem;
@@ -32,51 +107,40 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.fc-button:hover {
+.modern-mobile-calendar .fc-button:hover {
   background-color: #0056b3 !important;
 }
 
-.fc-daygrid-day-number {
+.modern-mobile-calendar .fc-daygrid-day-number {
   font-weight: bold;
   color: #4f5357;
   text-decoration: none;
 }
 
-.fc-col-header-cell-cushion {
+.modern-mobile-calendar .fc-col-header-cell-cushion {
   font-weight: bold;
   color: #495057;
   text-align: center;
   text-decoration: none;
 }
 
-.end-time-hidden {
+.modern-mobile-calendar .end-time-hidden {
   display: none;
 }
 
-@media (max-width: 768px) {
-  .fc-button {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.8rem;
-  }
-
-  .fc {
-    padding: 0.5rem;
-  }
-}
-
-.calendar-container {
+.modern-mobile-calendar .calendar-container {
   height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.calendar-container .fc {
+.modern-mobile-calendar .calendar-container .fc {
   flex-grow: 1;
   height: 100%;
   overflow: hidden;
 }
 
-.fc-daygrid-day {
+.modern-mobile-calendar .fc-daygrid-day {
   text-align: left;
   vertical-align: top;
   font-family: "Arial", sans-serif;
@@ -88,27 +152,132 @@
   transition: all 0.3s ease;
 }
 
-.fc-daygrid-day:hover {
+.modern-mobile-calendar .fc-daygrid-day:hover {
   background-color: #f8f9fa;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.fc-day-today {
-  background-color: #e9ecef !important;
-  border: 2px solid #007bff;
-  color: #007bff !important;
-  font-weight: bold;
+.modern-mobile-calendar .calendar-has-event {
+  position: relative;
+  z-index: 1;
+}
+
+.modern-mobile-calendar .calendar-has-event abbr {
+  color: #1976d2;
+  border-radius: 50%;
+  width: 2.2em;
+  height: 2.2em;
+  line-height: 2.2em;
+  display: inline-block;
+  font-weight: 600;
+  box-shadow: 0 0 0 2px #bbdefb;
+  text-align: center;
+  vertical-align: middle;
 }
 
 @media (max-width: 768px) {
-  .calendar-container {
+  .modern-mobile-calendar .fc-button {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+  .modern-mobile-calendar .fc {
+    padding: 0.5rem;
+  }
+  .modern-mobile-calendar .calendar-container {
     padding: 0;
     height: 75vh;
   }
-
-  .fc-daygrid-day {
+  .modern-mobile-calendar .fc-daygrid-day {
     font-size: 0.9rem;
     padding: 0.4rem;
   }
+  .modern-mobile-calendar {
+    font-size: 0.95rem;
+    max-width: 100vw;
+    padding: 0.2rem;
+  }
+
+  .react-calendar__tile {
+    width: 50px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Give ALL abbrs a fixed size and center them */
+.modern-mobile-calendar .react-calendar__tile abbr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.2em;
+  min-height: 2.2em;
+  line-height: 2.2em;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.modern-mobile-calendar .calendar-has-event abbr {
+  border-radius: 50%;
+  border: 1px solid #1976d2;
+  box-shadow: 0 0 0 2px #bbdefb;
+}
+
+.react-calendar__tile--active.calendar-has-event abbr {
+  color: #ffffff !important;
+}
+
+/* --- Minimal react-calendar tile styles --- */
+.modern-mobile-calendar .react-calendar__tile--active abbr {
+  background: #1976d2 !important; /* Filled blue for selected */
+  color: #fff !important;
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+/* Remove cell background for selected/hovered/active states */
+.modern-mobile-calendar .react-calendar__tile--active,
+.modern-mobile-calendar .react-calendar__tile:enabled:hover,
+.modern-mobile-calendar .react-calendar__tile:enabled:focus {
+  background: none !important;
+  color: inherit;
+}
+
+.modern-mobile-calendar
+  .react-calendar__tile--now:not(.react-calendar__tile--active)
+  abbr {
+  background: none;
+  color: #1976d2;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #bbdefb;
+}
+
+.modern-mobile-calendar .calendar-has-event abbr {
+  background: #f0f4fa;
+  color: #1976d2;
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.react-calendar__tile--active.calendar-has-event abbr {
+  background: #1976d2 !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
+.react-calendar__tile--now.calendar-has-event abbr {
+  background: #f0f4fa;
+  color: #1976d2;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #1976d2;
+}
+
+.modern-mobile-calendar .react-calendar__tile:enabled:hover abbr,
+.modern-mobile-calendar .react-calendar__tile:enabled:focus abbr {
+  border-radius: 50%;
+  background: #e3e8ee;
+  color: #1976d2;
 }

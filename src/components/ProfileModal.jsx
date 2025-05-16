@@ -1,5 +1,4 @@
 import { supabase } from "../services/supabaseClient";
-import { useState } from "react";
 
 export default function ProfileModal({
   displayName,
@@ -7,8 +6,6 @@ export default function ProfileModal({
   onSaveProfile,
   onClose,
 }) {
-  const [tempDisplayName, setTempDisplayName] = useState(displayName);
-
   const verifyDeleteAccount = () => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete your account? This action cannot be undone."
@@ -69,7 +66,7 @@ export default function ProfileModal({
   };
 
   const handleSave = () => {
-    setDisplayName(tempDisplayName); // Update the actual displayName
+    setDisplayName(displayName); // Update the actual displayName
     onSaveProfile(); // Call the save handler
   };
 
@@ -102,8 +99,7 @@ export default function ProfileModal({
                   type="text"
                   className="form-control"
                   id="displayName"
-                  value={tempDisplayName}
-                  onChange={(e) => setTempDisplayName(e.target.value)}
+                  onChange={(e) => setDisplayName(e.target.value)}
                 />
               </div>
             </form>
